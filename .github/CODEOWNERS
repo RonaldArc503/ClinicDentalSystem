@@ -1,0 +1,14 @@
+# Default owners for the entire repository
+* @RonaldArc503
+
+# CI/CD pipeline
+.github/workflows/ @RonaldArc503
+
+# Shared Kernel
+src/BuildingBlocks/SharedKernel/ @RonaldArc503
+
+# Identity microservice
+src/Services/Identity/ @RonaldArc503
+
+# Documentation
+docs/ @RonaldArc503
