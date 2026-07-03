@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/BuildingBlocks/" />
+  <Folder Name="/src/Services/" />
+  <Folder Name="/src/Services/Identity/">
+    <Project Path="src/Services/Identity/Identity.Application/Identity.Application.csproj" />
+    <Project Path="src/Services/Identity/Identity.Domain/Identity.Domain.csproj" />
+    <Project Path="src/Services/Identity/Identity.Infrastructure/Identity.Infrastructure.csproj" />
+    <Project Path="src/Services/Identity/Identity.Persistence/Identity.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Identity.Application.Tests/Identity.Application.Tests.csproj" />
+  </Folder>
+  <Project Path="src/BuildingBlocks/SharedKernel/SharedKernel.csproj" />
+  <Project Path="src/Services/Identity/Identity.API/Identity.API.csproj" />
+</Solution>
