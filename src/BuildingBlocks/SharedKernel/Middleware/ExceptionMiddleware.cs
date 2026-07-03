@@ -16,26 +16,28 @@ namespace SharedKernel.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
+            ArgumentNullException.ThrowIfNull(context);
+
             try
             {
-                await _next(context);
+                await _next(context).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                await HandleExceptionAsync(context, ex);
+                await HandleExceptionAsync(context, ex).ConfigureAwait(false);
             }
         }
 
         private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            var (statusCode, title, detail) = MapException(exception);
+            (HttpStatusCode StatusCode, string Title, string Detail) mapped = MapException(exception);
 
-            var problemDetails = new ProblemDetails
+            ProblemDetails problemDetails = new()
             {
-                Type = $"https://httpstatuses.com/{(int)statusCode}",
-                Title = title,
-                Status = (int)statusCode,
-                Detail = detail,
+                Type = $"https://httpstatuses.com/{(int)mapped.StatusCode}",
+                Title = mapped.Title,
+                Status = (int)mapped.StatusCode,
+                Detail = mapped.Detail,
                 Instance = context.Request.Path
             };
 
@@ -45,9 +47,9 @@ namespace SharedKernel.Middleware
             }
 
             context.Response.ContentType = "application/problem+json";
-            context.Response.StatusCode = (int)statusCode;
+            context.Response.StatusCode = (int)mapped.StatusCode;
 
-            await context.Response.WriteAsJsonAsync(problemDetails);
+            await context.Response.WriteAsJsonAsync(problemDetails).ConfigureAwait(false);
         }
 
         private static (HttpStatusCode StatusCode, string Title, string Detail) MapException(Exception exception)

@@ -1,20 +1,106 @@
 root = true
 
+# All files
 [*]
 indent_style = space
 indent_size = 4
 insert_final_newline = true
 trim_trailing_whitespace = true
+end_of_line = crlf
+charset = utf-8
 
+# XML / config / JSON
+[*.{xml,config,json,yml,yaml}]
+indent_size = 2
+
+# C# source
 [*.cs]
 indent_size = 4
+
+# ---- Style rules (IDE) ----
+# using placement
+dotnet_style_using_directive_placement = outside_namespace:warning
+dotnet_style_predefined_type_for_locals_parameters_members = true:warning
+dotnet_style_predefined_type_for_member_access = true:warning
+dotnet_style_object_initializer = true:warning
+dotnet_style_collection_initializer = true:warning
+dotnet_style_coalesce_expression = true:warning
+dotnet_style_null_propagation = true:warning
+dotnet_style_explicit_tuple_names = true:warning
+dotnet_style_require_auto_properties = true:warning
+
+# var preferences (suggest explicit, but don't block build)
+csharp_style_var_for_built_in_types = false:refactoring
+csharp_style_var_when_type_is_apparent = false:refactoring
+csharp_style_var_elsewhere = false:refactoring
+
+# expression-level
+csharp_style_expression_bodied_methods = true:refactoring
+csharp_style_expression_bodied_constructors = true:refactoring
+csharp_style_expression_bodied_properties = true:warning
+csharp_style_expression_bodied_indexers = true:warning
+csharp_style_expression_bodied_accessors = true:warning
+csharp_style_expression_bodied_lambdas = true:warning
+csharp_style_inlined_variable_declaration = true:warning
+csharp_prefer_simple_using_statement = true:warning
+csharp_prefer_braces = true:warning
+
+# modifiers
+csharp_preferred_modifier_order = public, private, protected, internal, static, extern, new, virtual, abstract, sealed, override, readonly, unsafe, required, file:warning
+dotnet_style_readonly_field = true:warning
+
+# null checks
+csharp_style_throw_expression = true:warning
+csharp_style_pattern_matching_over_is_with_cast_check = true:warning
+csharp_style_pattern_matching_over_as_with_null_check = true:warning
+
+# newline / braces
 csharp_new_line_before_open_brace = all
 csharp_new_line_before_else = true
 csharp_new_line_before_catch = true
 csharp_new_line_before_finally = true
 csharp_new_line_before_members_in_anonymous_types = false
 csharp_new_line_before_members_in_object_initializers = false
-csharp_using_directive_placement = outside_namespace
 
-[*.{xml,config,json}]
-indent_size = 2
+# ---- Naming rules ----
+# public members: PascalCase
+dotnet_naming_rule.public_members_should_be_pascal_case.severity = warning
+dotnet_naming_rule.public_members_should_be_pascal_case.symbols = public_members
+dotnet_naming_rule.public_members_should_be_pascal_case.style = pascal_case
+dotnet_naming_symbols.public_members.applicable_accessibilities = public
+dotnet_naming_symbols.public_members.applicable_kinds = method, property, event, field, delegate
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+# private fields: _camelCase
+dotnet_naming_rule.private_fields_should_be_camel_case.severity = warning
+dotnet_naming_rule.private_fields_should_be_camel_case.symbols = private_fields
+dotnet_naming_rule.private_fields_should_be_camel_case.style = camel_case_underscore
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_style.camel_case_underscore.capitalization = camel_case
+dotnet_naming_style.camel_case_underscore.required_prefix = _
+
+# interfaces: I prefix
+dotnet_naming_rule.interfaces_should_be_iprefixed.severity = warning
+dotnet_naming_rule.interfaces_should_be_iprefixed.symbols = interfaces
+dotnet_naming_rule.interfaces_should_be_iprefixed.style = iprefix
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_style.iprefix.capitalization = pascal_case
+dotnet_naming_style.iprefix.required_prefix = I
+
+# ---- Code analysis (CA) ----
+dotnet_diagnostic.CA1032.severity = none      # Standard exception constructors; verbose for domain exceptions
+dotnet_diagnostic.CA1062.severity = none      # Argument null validation; framework guarantees non-null in most cases
+dotnet_diagnostic.CA2007.severity = none      # ConfigureAwait(false); designed for library code, not app code
+dotnet_diagnostic.CA1305.severity = none      # IFormatProvider; low impact
+dotnet_diagnostic.CA2016.severity = none      # CancellationToken forwarding; not critical
+dotnet_diagnostic.CA1711.severity = none      # Permission/RolePermission are domain entity names, not flags
+dotnet_diagnostic.CA1716.severity = none      # 'Error' conflicts with VB keyword; acceptable in C# project
+dotnet_diagnostic.CA1724.severity = none      # Type names should not match namespaces (conflicts with ValueObject)
+
+# Test files: allow underscores in names (xUnit convention)
+[tests/**/*.cs]
+dotnet_diagnostic.CA1707.severity = none
+
+# ---- Build enforcement ----
+dotnet_style_require_auto_properties = true:warning

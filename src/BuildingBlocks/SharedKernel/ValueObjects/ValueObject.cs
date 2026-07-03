@@ -23,8 +23,8 @@ namespace SharedKernel.ValueObjects
 
         public static bool operator ==(ValueObject? left, ValueObject? right)
         {
-            if (left is null && right is null) return true;
-            if (left is null || right is null) return false;
+            if (left is null && right is null) { return true; }
+            if (left is null || right is null) { return false; }
             return left.Equals(right);
         }
 

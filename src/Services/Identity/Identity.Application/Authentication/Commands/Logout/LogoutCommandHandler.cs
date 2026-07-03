@@ -18,8 +18,10 @@ namespace Identity.Application.Authentication.Commands.Logout
 
         public async Task Handle(LogoutCommand request, CancellationToken cancellationToken)
         {
-            await _refreshTokenRepository.RevokeAllForUserAsync(request.UserId);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            ArgumentNullException.ThrowIfNull(request);
+
+            await _refreshTokenRepository.RevokeAllForUserAsync(request.UserId).ConfigureAwait(false);
+            await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 }

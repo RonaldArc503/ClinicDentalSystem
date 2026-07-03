@@ -1,4 +1,5 @@
 using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 
 namespace Identity.Application.Behaviors
@@ -15,16 +16,18 @@ namespace Identity.Application.Behaviors
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
+            ArgumentNullException.ThrowIfNull(next);
+
             if (!_validators.Any())
             {
-                return await next();
+                return await next(cancellationToken).ConfigureAwait(false);
             }
 
-            var context = new ValidationContext<TRequest>(request);
-            var validationResults = await Task.WhenAll(
-                _validators.Select(v => v.ValidateAsync(context, cancellationToken)));
+            ValidationContext<TRequest> context = new(request);
+            ValidationResult[] validationResults = await Task.WhenAll(
+                _validators.Select(v => v.ValidateAsync(context, cancellationToken))).ConfigureAwait(false);
 
-            var failures = validationResults
+            List<ValidationFailure> failures = validationResults
                 .SelectMany(r => r.Errors)
                 .Where(f => f is not null)
                 .ToList();
@@ -35,7 +38,7 @@ namespace Identity.Application.Behaviors
                     failures.Select(f => f.ErrorMessage).ToList());
             }
 
-            return await next();
+            return await next(cancellationToken).ConfigureAwait(false);
         }
     }
 }

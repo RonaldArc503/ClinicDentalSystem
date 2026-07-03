@@ -28,7 +28,9 @@ namespace Identity.Application.Authentication.Commands.Login
 
         public async Task<LoginResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
-            var user = await FindUserAsync(request.EmailOrUsername);
+            ArgumentNullException.ThrowIfNull(request);
+
+            Domain.Entities.User? user = await FindUserAsync(request.EmailOrUsername).ConfigureAwait(false);
 
             if (user is null || !user.IsActive || !_passwordHasher.Verify(request.Password, user.PasswordHash))
             {
@@ -37,17 +39,17 @@ namespace Identity.Application.Authentication.Commands.Login
 
             user.MarkLogin();
 
-            var accessToken = await _jwtTokenGenerator.GenerateAccessTokenAsync(user);
-            var refreshToken = _jwtTokenGenerator.GenerateRefreshToken();
+            string accessToken = await _jwtTokenGenerator.GenerateAccessTokenAsync(user).ConfigureAwait(false);
+            string refreshToken = _jwtTokenGenerator.GenerateRefreshToken();
 
-            var refreshTokenEntity = Domain.Entities.RefreshToken.Create(
+            Domain.Entities.RefreshToken refreshTokenEntity = Domain.Entities.RefreshToken.Create(
                 Guid.NewGuid(),
                 user.Id,
                 refreshToken,
                 DateTime.UtcNow.AddDays(7));
 
-            await _refreshTokenRepository.AddAsync(refreshTokenEntity);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _refreshTokenRepository.AddAsync(refreshTokenEntity).ConfigureAwait(false);
+            await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
             return new LoginResponse(
                 accessToken,
@@ -61,12 +63,12 @@ namespace Identity.Application.Authentication.Commands.Login
         {
             if (emailOrUsername.Contains('@'))
             {
-                var email = Email.Create(emailOrUsername);
-                return await _userRepository.GetByEmailAsync(email);
+                Email email = Email.Create(emailOrUsername);
+                return await _userRepository.GetByEmailAsync(email).ConfigureAwait(false);
             }
 
-            var username = Username.Create(emailOrUsername);
-            return await _userRepository.GetByUsernameAsync(username);
+            Username username = Username.Create(emailOrUsername);
+            return await _userRepository.GetByUsernameAsync(username).ConfigureAwait(false);
         }
     }
 }

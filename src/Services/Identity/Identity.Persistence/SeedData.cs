@@ -10,7 +10,9 @@ namespace Identity.Persistence
         public static async Task InitializeAsync(IdentityDbContext context, string? adminPasswordHash = null)
         {
             if (await context.Roles.AnyAsync())
+            {
                 return;
+            }
 
             var roles = SeedRoles();
             var permissions = SeedPermissions();

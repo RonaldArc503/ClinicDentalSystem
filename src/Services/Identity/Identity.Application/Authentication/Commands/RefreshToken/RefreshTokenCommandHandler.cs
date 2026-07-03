@@ -26,34 +26,36 @@ namespace Identity.Application.Authentication.Commands.RefreshToken
 
         public async Task<LoginResponse> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
-            var existingToken = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken);
+            ArgumentNullException.ThrowIfNull(request);
+
+            Domain.Entities.RefreshToken? existingToken = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken).ConfigureAwait(false);
 
             if (existingToken is null || !existingToken.IsActive)
             {
                 throw new InvalidOperationException("Invalid refresh token.");
             }
 
-            var user = await _userRepository.GetByIdAsync(existingToken.UserId);
+            Domain.Entities.User? user = await _userRepository.GetByIdAsync(existingToken.UserId).ConfigureAwait(false);
 
             if (user is null || !user.IsActive)
             {
                 throw new InvalidOperationException("Invalid refresh token.");
             }
 
-            var newRefreshTokenString = _jwtTokenGenerator.GenerateRefreshToken();
+            string newRefreshTokenString = _jwtTokenGenerator.GenerateRefreshToken();
             existingToken.Revoke(newRefreshTokenString);
-            await _refreshTokenRepository.UpdateAsync(existingToken);
+            await _refreshTokenRepository.UpdateAsync(existingToken).ConfigureAwait(false);
 
-            var accessToken = await _jwtTokenGenerator.GenerateAccessTokenAsync(user);
+            string accessToken = await _jwtTokenGenerator.GenerateAccessTokenAsync(user).ConfigureAwait(false);
 
-            var newRefreshTokenEntity = Domain.Entities.RefreshToken.Create(
+            Domain.Entities.RefreshToken newRefreshTokenEntity = Domain.Entities.RefreshToken.Create(
                 Guid.NewGuid(),
                 user.Id,
                 newRefreshTokenString,
                 DateTime.UtcNow.AddDays(7));
 
-            await _refreshTokenRepository.AddAsync(newRefreshTokenEntity);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _refreshTokenRepository.AddAsync(newRefreshTokenEntity).ConfigureAwait(false);
+            await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
             return new LoginResponse(
                 accessToken,

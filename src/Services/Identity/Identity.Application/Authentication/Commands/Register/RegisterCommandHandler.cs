@@ -23,22 +23,28 @@ namespace Identity.Application.Authentication.Commands.Register
 
         public async Task<RegisterResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
-            var email = Email.Create(request.Email);
-            var username = Username.Create(request.Username);
+            ArgumentNullException.ThrowIfNull(request);
 
-            if (await _userRepository.ExistsByEmailAsync(email))
+            Email email = Email.Create(request.Email);
+            Username username = Username.Create(request.Username);
+
+            if (await _userRepository.ExistsByEmailAsync(email).ConfigureAwait(false))
+            {
                 throw new InvalidOperationException($"Email '{request.Email}' is already registered.");
+            }
 
-            if (await _userRepository.ExistsByUsernameAsync(username))
+            if (await _userRepository.ExistsByUsernameAsync(username).ConfigureAwait(false))
+            {
                 throw new InvalidOperationException($"Username '{request.Username}' is already taken.");
+            }
 
-            var personName = PersonName.Create(request.FirstName, request.LastName);
-            var passwordHash = _passwordHasher.Hash(request.Password);
+            PersonName personName = PersonName.Create(request.FirstName, request.LastName);
+            string passwordHash = _passwordHasher.Hash(request.Password);
 
-            var user = User.Create(Guid.NewGuid(), personName, email, username, passwordHash);
+            User user = User.Create(Guid.NewGuid(), personName, email, username, passwordHash);
 
-            await _userRepository.AddAsync(user);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _userRepository.AddAsync(user).ConfigureAwait(false);
+            await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
             return new RegisterResponse(
                 user.Id,

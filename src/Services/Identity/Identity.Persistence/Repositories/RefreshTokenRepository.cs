@@ -45,10 +45,7 @@ namespace Identity.Persistence.Repositories
             var refreshToken = await _dbContext.RefreshTokens
                 .FirstOrDefaultAsync(rt => rt.Token == token);
 
-            if (refreshToken is not null)
-            {
-                refreshToken.Revoke();
-            }
+            refreshToken?.Revoke();
         }
 
         public async Task RevokeAllForUserAsync(Guid userId)

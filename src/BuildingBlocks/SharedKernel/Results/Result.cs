@@ -9,10 +9,14 @@ namespace SharedKernel.Results
         protected Result(bool isSuccess, Error error)
         {
             if (isSuccess && error != Error.None)
+            {
                 throw new InvalidOperationException("A successful result cannot contain an error.");
+            }
 
             if (!isSuccess && error == Error.None)
+            {
                 throw new InvalidOperationException("A failed result must contain an error.");
+            }
 
             IsSuccess = isSuccess;
             Error = error;

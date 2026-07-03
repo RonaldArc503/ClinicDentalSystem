@@ -14,14 +14,20 @@ namespace Identity.Domain.ValueObjects
         public static Email Create(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
+            {
                 throw new ArgumentException("Email cannot be empty.", nameof(value));
+            }
 
             if (!value.Contains('@') || !value.Contains('.'))
+            {
                 throw new ArgumentException("Email must contain '@' and a domain.", nameof(value));
+            }
 
-            var parts = value.Split('@');
+            string[] parts = value.Split('@');
             if (parts.Length != 2 || string.IsNullOrWhiteSpace(parts[0]) || string.IsNullOrWhiteSpace(parts[1]))
+            {
                 throw new ArgumentException("Email format is invalid.", nameof(value));
+            }
 
             return new Email(value.Trim().ToLowerInvariant());
         }
@@ -33,6 +39,10 @@ namespace Identity.Domain.ValueObjects
 
         public override string ToString() => Value;
 
-        public static implicit operator string(Email email) => email.Value;
+        public static implicit operator string(Email email)
+        {
+            ArgumentNullException.ThrowIfNull(email);
+            return email.Value;
+        }
     }
 }

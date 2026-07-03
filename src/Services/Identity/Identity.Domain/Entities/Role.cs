@@ -22,7 +22,9 @@ namespace Identity.Domain.Entities
         public static Role Create(int id, string name, string? description = null)
         {
             if (string.IsNullOrWhiteSpace(name))
+            {
                 throw new ArgumentException("Role name cannot be empty.", nameof(name));
+            }
 
             return new Role(id, name.Trim(), description?.Trim());
         }
@@ -34,18 +36,24 @@ namespace Identity.Domain.Entities
 
         public void AddPermission(Permission permission)
         {
+            ArgumentNullException.ThrowIfNull(permission);
+
             if (_rolePermissions.Any(rp => rp.PermissionId == permission.Id))
+            {
                 return;
+            }
 
             _rolePermissions.Add(RolePermission.Create(default, Id, permission.Id));
         }
 
         public void RemovePermission(int permissionId)
         {
-            var rolePermission = _rolePermissions.FirstOrDefault(rp => rp.PermissionId == permissionId);
+            RolePermission? rolePermission = _rolePermissions.FirstOrDefault(rp => rp.PermissionId == permissionId);
 
             if (rolePermission is not null)
+            {
                 _rolePermissions.Remove(rolePermission);
+            }
         }
     }
 }

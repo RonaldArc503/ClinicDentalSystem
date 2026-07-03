@@ -40,7 +40,9 @@ namespace Identity.Domain.Entities
             string passwordHash)
         {
             if (string.IsNullOrWhiteSpace(passwordHash))
+            {
                 throw new ArgumentException("Password hash cannot be empty.", nameof(passwordHash));
+            }
 
             return new User(id, personName, email, username, passwordHash);
         }
@@ -63,7 +65,9 @@ namespace Identity.Domain.Entities
         public void UpdatePasswordHash(string passwordHash)
         {
             if (string.IsNullOrWhiteSpace(passwordHash))
+            {
                 throw new ArgumentException("Password hash cannot be empty.", nameof(passwordHash));
+            }
 
             PasswordHash = passwordHash;
         }
@@ -85,18 +89,24 @@ namespace Identity.Domain.Entities
 
         public void AssignRole(Role role)
         {
+            ArgumentNullException.ThrowIfNull(role);
+
             if (_userRoles.Any(ur => ur.RoleId == role.Id))
+            {
                 return;
+            }
 
             _userRoles.Add(UserRole.Create(default, Id, role.Id));
         }
 
         public void RemoveRole(int roleId)
         {
-            var userRole = _userRoles.FirstOrDefault(ur => ur.RoleId == roleId);
+            UserRole? userRole = _userRoles.FirstOrDefault(ur => ur.RoleId == roleId);
 
             if (userRole is not null)
+            {
                 _userRoles.Remove(userRole);
+            }
         }
 
         public bool HasRole(string roleName)

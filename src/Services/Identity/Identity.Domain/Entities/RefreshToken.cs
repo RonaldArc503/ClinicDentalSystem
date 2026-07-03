@@ -28,10 +28,14 @@ namespace Identity.Domain.Entities
         public static RefreshToken Create(Guid id, Guid userId, string token, DateTime expiresAt)
         {
             if (string.IsNullOrWhiteSpace(token))
+            {
                 throw new ArgumentException("Token cannot be empty.", nameof(token));
+            }
 
             if (expiresAt <= DateTime.UtcNow)
+            {
                 throw new ArgumentException("Expiration date must be in the future.", nameof(expiresAt));
+            }
 
             return new RefreshToken(id, userId, token, expiresAt);
         }
